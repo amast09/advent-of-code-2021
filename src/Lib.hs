@@ -1,7 +1,7 @@
 module Lib (calculateAnswers, fileToInts) where
 
 import Control.Exception.Base (IOException, catch)
-import Day1.SonarSweeper (getNumberOfDepthIncreases)
+import Day1.SonarSweeper (getNumberOfDepthIncreases, getNumberOfWindowedDepthIncreases)
 import Text.Read (readMaybe)
 
 safeLoadFile' :: String -> IO (Maybe String)
@@ -24,6 +24,8 @@ fileToInts filePath = do
 
 calculateAnswers :: IO ()
 calculateAnswers = do
-  (Just day1Puzzle1Data) <- fileToInts "src/Day1/sonar-sweeper-data.txt"
-  let day1Puzzle1Result = getNumberOfDepthIncreases day1Puzzle1Data
+  (Just day1PuzzleData) <- fileToInts "src/Day1/sonar-sweeper-data.txt"
+  let day1Puzzle1Result = getNumberOfDepthIncreases day1PuzzleData
+  let day1Puzzle2Result = getNumberOfWindowedDepthIncreases day1PuzzleData
   putStrLn ("The Answer to Day 1 Puzzle 1 is: " ++ (show day1Puzzle1Result))
+  putStrLn ("The Answer to Day 1 Puzzle 2 is: " ++ (show day1Puzzle2Result))
