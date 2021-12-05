@@ -27,6 +27,8 @@ library
   exposed-modules:
       Day1.SonarSweeper
       Day2.Dive
+      Day2.Position
+      Day2.PositionWithAim
       Lib
   other-modules:
       Paths_adventofcode2021

@@ -2,7 +2,9 @@ module Lib (calculateAnswers, fileToInts, fileToCommands) where
 
 import Control.Exception.Base (IOException, catch)
 import Day1.SonarSweeper (getNumberOfDepthIncreases, getNumberOfWindowedDepthIncreases)
-import Day2.Dive (Command, commandFromString, calculateFinalPosition, depth, horizontalPosition)
+import Day2.Dive (Command, calculateFinalPosition, calculateFinalPositionWithAim, commandFromString)
+import Day2.Position as P
+import Day2.PositionWithAim as PWA
 import Text.Read (readMaybe)
 
 safeLoadFile' :: String -> IO (Maybe String)
@@ -46,6 +48,9 @@ calculateAnswers = do
   putStrLn ("The Answer to Day 1 Puzzle 2 is: " ++ (show day1Puzzle2Result))
 
   (Just day2PuzzleData) <- fileToCommands "src/Day2/dive-data.txt"
-  let finalPosition = calculateFinalPosition day2PuzzleData
-  let day2Puzzle1Result = (horizontalPosition finalPosition) * (depth finalPosition)
+  let puzzle1FinalPosition = calculateFinalPosition day2PuzzleData
+  let day2Puzzle1Result = (P.horizontalPosition puzzle1FinalPosition) * (P.depth puzzle1FinalPosition)
+  let puzzle2FinalPosition = calculateFinalPositionWithAim day2PuzzleData
+  let day2Puzzle2Result = (PWA.horizontalPosition (puzzle2FinalPosition)) * (PWA.depth puzzle2FinalPosition)
   putStrLn ("The Answer to Day 2 Puzzle 1 is: " ++ (show day2Puzzle1Result))
+  putStrLn ("The Answer to Day 2 Puzzle 2 is: " ++ (show day2Puzzle2Result))
