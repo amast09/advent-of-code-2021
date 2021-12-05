@@ -1,6 +1,7 @@
 module LibSpec (spec) where
 
-import Lib (fileToInts)
+import Day2.Dive
+import Lib (fileToCommands, fileToInts)
 import Test.Hspec
 
 spec :: Spec
@@ -18,3 +19,25 @@ spec = do
     it "returns Nothing when given a file that doesn't have Ints" $ do
       actualInts <- fileToInts "test/data/floats.txt"
       actualInts `shouldBe` Nothing
+
+  describe "fileToCommands" $ do
+    it "returns Just [Commands] when the file contains `Command`'s separated by new lines" $ do
+      let expectedCommands =
+            Just
+              [ Command Forward 5,
+                Command Down 5,
+                Command Forward 8,
+                Command Up 3,
+                Command Down 8,
+                Command Forward 2
+              ]
+      actualCommands <- fileToCommands "test/data/dive.txt"
+      actualCommands `shouldBe` expectedCommands
+
+    it "returns Nothing when given a file that does not exist" $ do
+      actualCommands <- fileToCommands "DOES NOT EXIST"
+      actualCommands `shouldBe` Nothing
+
+    it "returns Nothing when given a file that doesn't have Ints" $ do
+      actualCommands <- fileToCommands "test/data/floats.txt"
+      actualCommands `shouldBe` Nothing

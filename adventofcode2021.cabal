@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Day1.SonarSweeper
+      Day2.Dive
       Lib
   other-modules:
       Paths_adventofcode2021
@@ -35,6 +36,7 @@ library
       QuickCheck
     , base >=4.7 && <5
     , hspec
+    , regex-tdfa
   default-language: Haskell2010
 
 executable adventofcode2021-exe
@@ -49,6 +51,7 @@ executable adventofcode2021-exe
     , adventofcode2021
     , base >=4.7 && <5
     , hspec
+    , regex-tdfa
   default-language: Haskell2010
 
 test-suite adventofcode2021-test
@@ -56,6 +59,7 @@ test-suite adventofcode2021-test
   main-is: Spec.hs
   other-modules:
       Day1.SonarSweeperSpec
+      Day2.DiveSpec
       LibSpec
       Paths_adventofcode2021
   hs-source-dirs:
@@ -66,4 +70,5 @@ test-suite adventofcode2021-test
     , adventofcode2021
     , base >=4.7 && <5
     , hspec
+    , regex-tdfa
   default-language: Haskell2010
