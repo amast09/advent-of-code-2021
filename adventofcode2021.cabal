@@ -29,6 +29,7 @@ library
       Day2.Dive
       Day2.Position
       Day2.PositionWithAim
+      Day3.BinaryDiagnostic
       Lib
   other-modules:
       Paths_adventofcode2021
@@ -62,6 +63,7 @@ test-suite adventofcode2021-test
   other-modules:
       Day1.SonarSweeperSpec
       Day2.DiveSpec
+      Day3.BinaryDiagnosticSpec
       LibSpec
       Paths_adventofcode2021
   hs-source-dirs:
