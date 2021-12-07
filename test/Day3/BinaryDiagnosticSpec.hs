@@ -21,7 +21,7 @@ spec = do
               "00010",
               "01010"
             ]
-      calculatePowerConsumption binaryDiagnostics `shouldBe` 198
+      calculatePowerConsumption binaryDiagnostics `shouldBe` Right 198
 
     it "handles varying length diagnostics" $ do
       let binaryDiagnostics =
@@ -38,4 +38,21 @@ spec = do
               "0001",
               "0101"
             ]
-      calculatePowerConsumption binaryDiagnostics `shouldBe` 44
+      calculatePowerConsumption binaryDiagnostics `shouldBe` Right 44
+
+    it "handles bad input" $ do
+      let binaryDiagnostics =
+            [ "0010",
+              "1111",
+              "1011",
+              "1011",
+              "1010",
+              "gibberish",
+              "0011",
+              "1110",
+              "1000",
+              "1100",
+              "0001",
+              "0101"
+            ]
+      calculatePowerConsumption binaryDiagnostics `shouldBe` Left "Invalid input"

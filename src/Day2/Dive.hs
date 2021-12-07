@@ -2,7 +2,6 @@ module Day2.Dive (commandFromString, calculatePosition, calculateFinalPosition, 
 
 import Day2.Position as P
 import Day2.PositionWithAim as PWA
-import Debug.Trace
 import Text.Read (readMaybe)
 import Text.Regex.TDFA
 
@@ -11,8 +10,6 @@ data Direction = Forward | Down | Up deriving (Eq, Show)
 type Distance = Int
 
 data Command = Command Direction Distance deriving (Eq, Show)
-
-traceShow' arg = traceShow arg arg
 
 directionFromString :: String -> Maybe Direction
 directionFromString "up" = Just Up
