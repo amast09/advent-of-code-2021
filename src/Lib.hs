@@ -5,7 +5,7 @@ import Day1.SonarSweeper (getNumberOfDepthIncreases, getNumberOfWindowedDepthInc
 import Day2.Dive (Command, calculateFinalPosition, calculateFinalPositionWithAim, commandFromString)
 import Day2.Position as P
 import Day2.PositionWithAim as PWA
-import Day3.BinaryDiagnostic (calculatePowerConsumption)
+import Day3.BinaryDiagnostic (calculatePowerConsumption, calculateLifeSupportRating)
 import Text.Read (readMaybe)
 
 safeLoadFile' :: String -> IO (Maybe String)
@@ -58,7 +58,9 @@ calculateAnswers = do
   let day2Puzzle2Result = PWA.horizontalPosition puzzle2FinalPosition * PWA.depth puzzle2FinalPosition
   putStrLn ("The Answer to Day 2 Puzzle 1 is: " ++ show day2Puzzle1Result)
   putStrLn ("The Answer to Day 2 Puzzle 2 is: " ++ show day2Puzzle2Result)
-  
+
   (Just day3PuzzleData) <- fileToStrings "src/Day3/binary-diagnostics.txt"
   let (Right day3Puzzle1Result) = calculatePowerConsumption day3PuzzleData
+  let (Right day3Puzzle2Result) = calculateLifeSupportRating day3PuzzleData
   putStrLn ("The Answer to Day 3 Puzzle 1 is: " ++ show day3Puzzle1Result)
+  putStrLn ("The Answer to Day 3 Puzzle 2 is: " ++ show day3Puzzle2Result)

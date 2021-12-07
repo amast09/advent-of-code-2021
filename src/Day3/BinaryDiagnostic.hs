@@ -1,10 +1,15 @@
-module Day3.BinaryDiagnostic (calculatePowerConsumption) where
+module Day3.BinaryDiagnostic (calculatePowerConsumption, calculateOxygenRating, calculateC02ScrubberRating, calculateLifeSupportRating) where
 
 import Control.Lens
 import Data.Char (digitToInt)
 import Data.List (foldl')
+import Util
 
-data Acc = Acc {currentIdx :: Int, rates :: [Int]} deriving (Show, Eq)
+type Rate = Int
+
+type DiagnosticLine = String
+
+data Acc = Acc {currentIdx :: Int, rates :: [Rate]} deriving (Show, Eq)
 
 toDec :: String -> Int
 toDec = foldl' (\acc x -> acc * 2 + digitToInt x) 0
@@ -41,7 +46,77 @@ getPowerConsumption Acc {rates = rs} =
       epsilonRate = toDec $ map epsilonValueToBinary rs
    in (gammaRate * epsilonRate)
 
-calculatePowerConsumption :: [String] -> Either String Int
+calculatePowerConsumption :: [DiagnosticLine] -> Either String Int
 calculatePowerConsumption diagnosticLines =
-  let gammaMeasurements = foldl accDiagnosticLine (Right Acc {currentIdx = 0, rates = []}) diagnosticLines
-   in fmap getPowerConsumption gammaMeasurements
+  let rates = foldl accDiagnosticLine (Right Acc {currentIdx = 0, rates = []}) diagnosticLines
+   in fmap getPowerConsumption rates
+
+data BinaryPosition = Zero | One deriving (Show, Eq)
+
+checkBitInLine :: BinaryPosition -> Int -> DiagnosticLine -> Bool
+checkBitInLine bp bitIndex diagnosticLine = case diagnosticLine ^? element bitIndex of
+  (Just bit) -> (bp == One && bit == '1') || (bp == Zero && bit == '0')
+  Nothing -> False
+
+getRateForBit :: Int -> DiagnosticLine -> Either String Rate
+getRateForBit bitIndex diagnosticLine = case diagnosticLine ^? element bitIndex of
+  (Just bit) -> bitToRate bit
+  Nothing -> Left "Bad Diagnostic Line"
+
+data DiagnosticLinesWithIdx = DiagnosticLinesWithIdx Int [DiagnosticLine] deriving (Show, Eq)
+
+toNextDls :: DiagnosticLinesWithIdx -> Rate -> DiagnosticLinesWithIdx
+toNextDls (DiagnosticLinesWithIdx idx dls) rate =
+  let binaryPositionToFilter = if rate >= 0 then One else Zero
+      diagnosticFilter = checkBitInLine binaryPositionToFilter idx
+      nextDls = filter diagnosticFilter dls
+   in DiagnosticLinesWithIdx (idx + 1) nextDls
+
+get02Rating :: DiagnosticLinesWithIdx -> DiagnosticLinesWithIdx
+get02Rating (DiagnosticLinesWithIdx idx ([])) = DiagnosticLinesWithIdx idx []
+get02Rating (DiagnosticLinesWithIdx idx (dl : [])) = DiagnosticLinesWithIdx idx [dl]
+get02Rating (DiagnosticLinesWithIdx idx dls) =
+  let ratesResult = foldl (\acc dl -> (+) <$> acc <*> getRateForBit idx dl) (Right 0) dls
+   in case ratesResult of
+        (Right rate) -> get02Rating $ toNextDls (DiagnosticLinesWithIdx idx dls) rate
+        (Left _) -> (DiagnosticLinesWithIdx idx [])
+
+parse02RatingResult :: DiagnosticLinesWithIdx -> Either String Int
+parse02RatingResult (DiagnosticLinesWithIdx _ (dl : [])) = Right $ toDec dl
+parse02RatingResult _ = Left "Unable to match diagnostic lines to ratings"
+
+calculateOxygenRating :: [DiagnosticLine] -> Either String Int
+calculateOxygenRating diagnosticLines =
+  let o2RatingResult = get02Rating (DiagnosticLinesWithIdx 0 diagnosticLines)
+      o2Rating = parse02RatingResult o2RatingResult
+   in o2Rating
+
+----------------------------------------------------------------------------------------
+
+toNextDls2 :: DiagnosticLinesWithIdx -> Rate -> DiagnosticLinesWithIdx
+toNextDls2 (DiagnosticLinesWithIdx idx dls) rate =
+  let binaryPositionToFilter = if rate >= 0 then Zero else One
+      diagnosticFilter = checkBitInLine binaryPositionToFilter idx
+      nextDls = filter diagnosticFilter dls
+   in DiagnosticLinesWithIdx (idx + 1) nextDls
+
+get02Rating2 :: DiagnosticLinesWithIdx -> DiagnosticLinesWithIdx
+get02Rating2 (DiagnosticLinesWithIdx idx ([])) = DiagnosticLinesWithIdx idx []
+get02Rating2 (DiagnosticLinesWithIdx idx (dl : [])) = DiagnosticLinesWithIdx idx [dl]
+get02Rating2 (DiagnosticLinesWithIdx idx dls) =
+  let ratesResult = foldl (\acc dl -> (+) <$> acc <*> getRateForBit idx dl) (Right 0) dls
+   in case ratesResult of
+        (Right rate) -> get02Rating2 $ toNextDls2 (DiagnosticLinesWithIdx idx dls) rate
+        (Left _) -> (DiagnosticLinesWithIdx idx [])
+
+calculateC02ScrubberRating :: [DiagnosticLine] -> Either String Int
+calculateC02ScrubberRating diagnosticLines =
+  let o2RatingResult = get02Rating2 (DiagnosticLinesWithIdx 0 diagnosticLines)
+      o2Rating = parse02RatingResult o2RatingResult
+   in o2Rating
+
+calculateLifeSupportRating :: [DiagnosticLine] -> Either String Int
+calculateLifeSupportRating diagnosticLines =
+  let c02Rating = calculateC02ScrubberRating diagnosticLines
+      o2Rating = calculateOxygenRating diagnosticLines
+   in (*) <$> c02Rating <*> o2Rating
