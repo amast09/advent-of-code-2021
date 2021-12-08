@@ -1,44 +1,50 @@
 module Day1.SonarSweeper (getNumberOfDepthIncreases, getNumberOfWindowedDepthIncreases) where
 
-data Acc = Acc {numberOfIncreases :: Int, lastDepth :: Maybe Int}
+data DepthAcc = DepthAcc {numberOfIncreases :: Int, lastDepth :: Maybe Int}
+
+data WindowAcc = WindowAcc
+  { numWinIncreases :: Int,
+    lastWinDepth :: Maybe Int,
+    restOfMeasurements :: [Int]
+  }
 
 getNumberOfDepthIncreases :: [Int] -> Int
-getNumberOfDepthIncreases depths = numberOfIncreases $ foldl getNextAcc Acc {numberOfIncreases = 0, lastDepth = Nothing} depths
+getNumberOfDepthIncreases depths =
+  numberOfIncreases $ foldl nextDepthAcc DepthAcc {numberOfIncreases = 0, lastDepth = Nothing} depths
 
-getNextAcc :: Acc -> Int -> Acc
-getNextAcc (Acc {lastDepth = Nothing}) currentDepth = Acc {numberOfIncreases = 0, lastDepth = Just currentDepth}
-getNextAcc (Acc {numberOfIncreases = incs, lastDepth = Just (ld)}) currentDepth
-  | ld < currentDepth = Acc {numberOfIncreases = incs + 1, lastDepth = Just currentDepth}
-  | otherwise = Acc {numberOfIncreases = incs, lastDepth = Just currentDepth}
+nextDepthAcc :: DepthAcc -> Int -> DepthAcc
+nextDepthAcc (DepthAcc {lastDepth = Nothing}) currentDepth = DepthAcc {numberOfIncreases = 0, lastDepth = Just currentDepth}
+nextDepthAcc (DepthAcc {numberOfIncreases = incs, lastDepth = Just (ld)}) currentDepth
+  | ld < currentDepth = DepthAcc {numberOfIncreases = incs + 1, lastDepth = Just currentDepth}
+  | otherwise = DepthAcc {numberOfIncreases = incs, lastDepth = Just currentDepth}
 
-data WinAcc = WinAcc {numWinIncreases :: Int, lastWinDepth :: Maybe Int, restOfMeasurements :: [Int]}
-
-getWinIncrease :: WinAcc -> WinAcc
-getWinIncrease (WinAcc {numWinIncreases = nwi, lastWinDepth = Nothing, restOfMeasurements = (m1 : m2 : m3 : xs)}) =
-  getWinIncrease
-    WinAcc
+nextWindowedAcc :: WindowAcc -> WindowAcc
+nextWindowedAcc (WindowAcc {numWinIncreases = nwi, lastWinDepth = Nothing, restOfMeasurements = (m1 : m2 : m3 : xs)}) =
+  nextWindowedAcc
+    WindowAcc
       { numWinIncreases = nwi,
         lastWinDepth = Just (m1 + m2 + m3),
         restOfMeasurements = ([m2] ++ [m3] ++ xs)
       }
-getWinIncrease (WinAcc {numWinIncreases = nwi, lastWinDepth = Just lwd, restOfMeasurements = (m1 : m2 : m3 : xs)}) =
+nextWindowedAcc (WindowAcc {numWinIncreases = nwi, lastWinDepth = Just lwd, restOfMeasurements = (m1 : m2 : m3 : xs)}) =
   let nextDepth = m1 + m2 + m3
       nextDepthIncreases = if nextDepth > lwd then (nwi + 1) else nwi
-   in getWinIncrease
-        WinAcc
+   in nextWindowedAcc
+        WindowAcc
           { numWinIncreases = nextDepthIncreases,
             lastWinDepth = Just nextDepth,
             restOfMeasurements = ([m2] ++ [m3] ++ xs)
           }
-getWinIncrease a = a
+nextWindowedAcc a = a
 
 getNumberOfWindowedDepthIncreases :: [Int] -> Int
 getNumberOfWindowedDepthIncreases depths =
-  numWinIncreases
-    ( getWinIncrease
-        WinAcc
+  let initialWinAcc =
+        WindowAcc
           { numWinIncreases = 0,
             lastWinDepth = Nothing,
             restOfMeasurements = depths
           }
-    )
+      finalWinAcc = nextWindowedAcc initialWinAcc
+      result = numWinIncreases finalWinAcc
+   in result

@@ -5,7 +5,7 @@ import Day1.SonarSweeper (getNumberOfDepthIncreases, getNumberOfWindowedDepthInc
 import Day2.Dive (Command, calculateFinalPosition, calculateFinalPositionWithAim, commandFromString)
 import Day2.Position as P
 import Day2.PositionWithAim as PWA
-import Day3.BinaryDiagnostic (calculatePowerConsumption, calculateLifeSupportRating)
+import Day3.BinaryDiagnostic (calculateLifeSupportRating, calculatePowerConsumption)
 import Text.Read (readMaybe)
 
 safeLoadFile' :: String -> IO (Maybe String)
